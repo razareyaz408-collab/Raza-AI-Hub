@@ -37,7 +37,8 @@ generateBtn.innerHTML="Generating...";
 
 try{
 
-// Backend URL yahan aayega
+const API_URL = "/.netlify/functions/generate";
+  
 const response = await fetch(API_URL,{
 method:"POST",
 headers:{
