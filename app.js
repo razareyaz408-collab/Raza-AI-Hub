@@ -38,8 +38,6 @@ generateBtn.innerHTML="Generating...";
 try{
 
 // Backend URL yahan aayega
-const API_URL="YOUR_BACKEND_URL";
-
 const response = await fetch(API_URL,{
 method:"POST",
 headers:{
@@ -58,7 +56,8 @@ if(data.image){
 
 resultImage.src=data.image;
 
-resultImage.style.display="block";
+resultImage.style.display="blconst API_URL = "/.netlify/functions/generate";
+  ock";
 
 downloadBtn.href=data.image;
 
