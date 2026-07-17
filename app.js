@@ -57,8 +57,7 @@ if(data.image){
 
 resultImage.src=data.image;
 
-resultImage.style.display="blconst API_URL = "/.netlify/functions/generate";
-  ock";
+resultImage.style.display = "block";
 
 downloadBtn.href=data.image;
 
