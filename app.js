@@ -1,22 +1,8 @@
-const prompt = document.getElementById("prompt");
-const generateBtn = document.getElementById("generateBtn");
-const loading = document.getElementById("loading");
-const resultImage = document.getElementById("resultImage");
-const downloadArea = document.getElementById("downloadArea");
-const downloadBtn = document.getElementById("downloadBtn");
-const themeBtn = document.getElementById("themeBtn");
-
-generateBtn.addEventListener("click", generateImage);
-
-themeBtn.addEventListener("click", () => {
-  document.body.classList.toggle("light");
-});
-
 async function generateImage() {
 
   const text = prompt.value.trim();
 
-  if (text === "") {
+  if (!text) {
     alert("Please enter image prompt.");
     return;
   }
@@ -30,44 +16,34 @@ async function generateImage() {
 
   try {
 
-    const API_URL = "/.netlify/functions/generate";
+    const imageUrl =
+      "https://image.pollinations.ai/prompt/" +
+      encodeURIComponent(text);
 
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        prompt: text,
-        size: document.getElementById("size").value,
-        quality: document.getElementById("quality").value
-      })
-    });
+    resultImage.src = imageUrl;
 
-    const data = await response.json();
-
-    if (data.image) {
-
-      resultImage.src = data.image;
+    resultImage.onload = () => {
+      loading.classList.add("hidden");
       resultImage.style.display = "block";
-
-      downloadBtn.href = data.image;
+      downloadBtn.href = imageUrl;
       downloadArea.classList.remove("hidden");
+      generateBtn.disabled = false;
+      generateBtn.innerHTML =
+        '<i class="fa-solid fa-image"></i> Generate Image';
+    };
 
-    } else {
-
-      alert(data.error || "Image generate failed.");
-
-    }
+    resultImage.onerror = () => {
+      throw new Error("Image load failed");
+    };
 
   } catch (err) {
 
-    alert("Server Error");
+    loading.classList.add("hidden");
+    generateBtn.disabled = false;
+    generateBtn.innerHTML =
+      '<i class="fa-solid fa-image"></i> Generate Image';
+
+    alert("Image generate failed.");
     console.error(err);
-
   }
-
-  loading.classList.add("hidden");
-  generateBtn.disabled = false;
-  generateBtn.innerHTML = '<i class="fa-solid fa-image"></i> Generate Image';
 }
