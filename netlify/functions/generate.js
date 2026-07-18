@@ -38,7 +38,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const imageBuffer = await response.arrayBuffer();
+    const imageBuffer = Buffer.from(await response.arrayBuffer());
     const base64 = Buffer.from(imageBuffer).toString("base64");
 
       return {
