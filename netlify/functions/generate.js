@@ -1,8 +1,15 @@
 exports.handler = async (event) => {
   try {
-    const { prompt } = JSON.parse(event.body);
+    if (event.httpMethod !== "POST") {
+      return {
+        statusCode: 405,
+        body: JSON.stringify({
+          error: "Method not allowed"
+        })
+      };
+    }
 
-    const HF_API_KEY = process.env.HF_API_KEY;
+    const { prompt } = JSON.parse(event.body || "{}");
 
     if (!prompt) {
       return {
@@ -13,12 +20,23 @@ exports.handler = async (event) => {
       };
     }
 
-      const response = await fetch(
+    const HF_API_KEY = process.env.HF_API_KEY;
+
+    if (!HF_API_KEY) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: "HF_API_KEY not found in Netlify Environment Variables"
+        })
+      };
+    }
+
+    const response = await fetch(
       "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${HF_API_KEY}`,
+          "Authorization": `Bearer ${HF_API_KEY}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -39,26 +57,23 @@ exports.handler = async (event) => {
     }
 
     const imageBuffer = Buffer.from(await response.arrayBuffer());
-    const base64 = Buffer.from(imageBuffer).toString("base64");
 
-      return {
+    return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        image: `data:image/png;base64,${base64}`
+        image: `data:image/png;base64,${imageBuffer.toString("base64")}`
       })
     };
 
   } catch (err) {
-
     return {
       statusCode: 500,
       body: JSON.stringify({
         error: err.message
       })
     };
-
   }
 };
